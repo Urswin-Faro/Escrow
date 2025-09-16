@@ -1,0 +1,17 @@
+Backend
+
+cd backend
+npm install express cors bcryptjs jsonwebtoken mysql2 dotenv
+
+to run Backend code:
+cd backend
+node src/server.js
+
+Frontend
+
+cd frontend
+npm install axios react react-dom react-scripts
+
+to run Frontend code:
+cd frontend
+npm start 
