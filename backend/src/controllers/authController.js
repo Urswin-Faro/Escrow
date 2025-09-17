@@ -4,7 +4,7 @@ const { jwtSecret } = require('../config');
 const userModel = require('../models/userModel');
 
 exports.register = async (req, res) => {
-  const { email, password } = req.body;
+  const { name, email, password, role } = req.body;
   try {
     const existingUser = await userModel.findUserByEmail(email);
     if (existingUser) {
@@ -14,7 +14,8 @@ exports.register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const newUser = await userModel.createUser(email, hashedPassword);
+    // Update this line to pass the new fields
+    const newUser = await userModel.createUser(email, hashedPassword, name, role);
     
     const payload = {
       user: {
@@ -24,7 +25,7 @@ exports.register = async (req, res) => {
 
     jwt.sign(
       payload,
-      jwtSecret,
+      process.env.JWT_SECRET,
       { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;

@@ -3,11 +3,13 @@ import axios from 'axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
+    role: 'buyer', // Default to 'buyer'
   });
 
-  const { email, password } = formData;
+  const { name, email, password, role } = formData;
 
   const onChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,11 +17,15 @@ const Register = () => {
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      // The endpoint must match the route you created in authRoutes.js
-      const res = await axios.post('http://localhost:5000/api/auth/register', formData);
-      console.log(res.data); // This should log the JWT token from the backend
+      const newUser = {
+        name,
+        email,
+        password,
+        role,
+      };
+      const res = await axios.post('http://localhost:5000/api/auth/register', newUser);
+      console.log(res.data);
       alert('Registration successful!');
-      // TODO: Save the token and redirect the user
     } catch (err) {
       console.error(err.response.data);
       alert(err.response.data.msg || 'Registration failed.');
@@ -30,6 +36,17 @@ const Register = () => {
     <div className="form-container">
       <h2>Register</h2>
       <form onSubmit={onSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={name}
+            onChange={onChange}
+            required
+          />
+        </div>
         <div className="form-group">
           <label htmlFor="email">Email:</label>
           <input
@@ -51,6 +68,13 @@ const Register = () => {
             onChange={onChange}
             required
           />
+        </div>
+        <div className="form-group">
+          <label htmlFor="role">Role:</label>
+          <select id="role" name="role" value={role} onChange={onChange} required>
+            <option value="buyer">Buyer</option>
+            <option value="seller">Seller</option>
+          </select>
         </div>
         <button type="submit">Register</button>
       </form>
