@@ -7,6 +7,7 @@ CREATE TABLE users (
     password VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 CREATE TABLE transactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     buyer_id INT NOT NULL,
@@ -19,6 +20,7 @@ CREATE TABLE transactions (
     FOREIGN KEY (buyer_id) REFERENCES users(id),
     FOREIGN KEY (seller_id) REFERENCES users(id)
 );
+
 CREATE TABLE disputes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     transaction_id INT NOT NULL,
