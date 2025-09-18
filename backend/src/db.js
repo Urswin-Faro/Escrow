@@ -1,7 +1,16 @@
-const mysql = require('mysql2/promise');
-const config = require('./config');
+// backend/db.js
+const { Pool } = require('pg');
 
-// The environment variables are loaded here from the config file
-const pool = mysql.createPool(config.database);
+const pool = new Pool({
+  user: 'postgres',
+  host: '192.168.1.54',
+  database: 'postgres',
+  password: 'Shafwan@1',
+  port: 5432,
+});
 
-module.exports = pool;
+pool.connect()
+  .then(() => console.log('Connected to Postgres!'))
+  .catch(err => console.error('Postgres connection error', err));
+
+module.exports = { pool };
