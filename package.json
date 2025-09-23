@@ -1,6 +1,10 @@
 {
   "dependencies": {
     "@vitejs/plugin-react": "^5.0.2",
+    "dotenv": "^17.2.2",
+    "express-rate-limit": "^8.1.0",
+    "nodemailer": "^7.0.6",
+    "pg": "^8.16.3",
     "vite": "^7.1.5"
   }
 }
