@@ -1,5 +1,5 @@
 // src/controllers/authController.js
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcryptjs'); // ✅ Change from 'bcrypt' to 'bcryptjs'
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -18,28 +18,48 @@ function generateNumericOtp(length = 6) {
 
 // ----------------- REGISTER -----------------
 exports.register = async (req, res) => {
-  // Use 'username' if provided, otherwise fallback to 'name', otherwise fallback to email prefix
   const { username, name, email, password, role } = req.body;
   const finalUsername = username || name || (email ? email.split('@')[0] : 'user');
 
   try {
+    console.log('\n=== REGISTER DEBUG START ===');
+    console.log('📨 Register request:', { email, username, name, finalUsername, role, passwordLength: password ? password.length : 0 });
+
     const existingUser = await userModel.findUserByEmail(email);
-    if (existingUser) return res.status(400).json({ msg: 'User already exists' });
+    console.log('👤 Existing user check:', existingUser ? 'USER EXISTS' : 'NEW USER');
+    
+    if (existingUser) {
+      console.log('❌ Registration failed - user exists');
+      console.log('=== REGISTER DEBUG END ===\n');
+      return res.status(400).json({ msg: 'User already exists' });
+    }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    console.log('🔒 Sending plain password to userModel (will be hashed there)');
 
-    const newUser = await userModel.createUser(email, hashedPassword, finalUsername, role);
+    // ✅ Pass the plain password - userModel will hash it
+    const newUser = await userModel.createUser(email, password, finalUsername, role);
+    console.log('✅ User created:', { id: newUser.id, email: newUser.email, username: newUser.username });
 
-    const payload = { user: { id: newUser.id } };
+    const payload = { user: { id: newUser.id, role: newUser.role } };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-      if (err) throw err;
-      res.json({ token });
+    console.log('✅ Registration successful, JWT created');
+    console.log('=== REGISTER DEBUG END ===\n');
+    
+    res.status(201).json({
+      message: 'User registered successfully',
+      token,
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        username: newUser.username,
+        role: newUser.role
+      }
     });
   } catch (err) {
-    console.error('register error:', err);
-    res.status(500).send('Server Error');
+    console.error('💥 Register error:', err.message);
+    console.log('=== REGISTER DEBUG END ===\n');
+    res.status(500).json({ error: 'Server error during registration' });
   }
 };
 
@@ -48,20 +68,89 @@ exports.login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    console.log('\n=== LOGIN DEBUG START ===');
+    console.log('📨 Login request body:', req.body);
+    console.log('📧 Email received:', email);
+    console.log('🔒 Password received:', password ? `YES (${password.length} chars)` : 'NO');
+
+    // Validate input
+    if (!email || !password) {
+      console.log('❌ Missing email or password');
+      console.log('=== LOGIN DEBUG END ===\n');
+      return res.status(400).json({ msg: 'Email and password are required' });
+    }
+
+    console.log('🔍 Looking up user by email:', email);
     const user = await userModel.findUserByEmail(email);
-    if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
+    console.log('👤 User lookup result:', user ? 'FOUND' : 'NOT FOUND');
+    
+    if (user) {
+      console.log('👤 User details:', {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role,
+        passwordExists: user.password ? 'YES' : 'NO',
+        passwordLength: user.password ? user.password.length : 0,
+        passwordStart: user.password ? user.password.substring(0, 20) + '...' : 'NO PASSWORD'
+      });
+    }
+    
+    // ✅ TEMPORARY BYPASS - Add after the user lookup
+    if (!user) {
+      console.log('❌ No user found with email:', email);
+      console.log('=== LOGIN DEBUG END ===\n');
+      return res.status(400).json({ msg: 'Invalid credentials' });
+    }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
+    console.log('🔒 Starting password comparison...');
+    console.log('🔒 Input password:', password);
+    console.log('🔒 Stored hash:', user.password);
 
+    let isMatch = false;
+
+    try {
+      // Try with current bcrypt library
+      isMatch = await bcrypt.compare(password, user.password);
+      console.log('🔒 bcrypt.compare result:', isMatch);
+    } catch (error) {
+      console.log('🔒 bcrypt.compare error:', error.message);
+      
+      // Fallback: Try installing and using bcryptjs
+      try {
+        const bcryptjs = require('bcryptjs');
+        isMatch = await bcryptjs.compare(password, user.password);
+        console.log('🔒 bcryptjs fallback result:', isMatch);
+      } catch (fallbackError) {
+        console.log('🔒 bcryptjs fallback error:', fallbackError.message);
+      }
+    }
+
+    console.log('🔒 Final password comparison result:', isMatch ? '✅ MATCH' : '❌ NO MATCH');
+    
+    if (!isMatch) {
+      console.log('❌ Password verification failed for user:', email);
+      console.log('=== LOGIN DEBUG END ===\n');
+      return res.status(400).json({ msg: 'Invalid credentials' });
+    }
+
+    console.log('✅ Password verified successfully');
     const payload = { user: { id: user.id } };
 
     jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-      if (err) throw err;
+      if (err) {
+        console.error('❌ JWT creation error:', err);
+        console.log('=== LOGIN DEBUG END ===\n');
+        throw err;
+      }
+      console.log('✅ Login successful, JWT created');
+      console.log('=== LOGIN DEBUG END ===\n');
       res.json({ token });
     });
   } catch (err) {
-    console.error('login error:', err);
+    console.error('💥 Login error:', err.message);
+    console.error('💥 Full error:', err);
+    console.log('=== LOGIN DEBUG END ===\n');
     res.status(500).send('Server Error');
   }
 };

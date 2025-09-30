@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../services/api'; 
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(null);
 
   const { email, password } = formData;
 
@@ -14,14 +16,27 @@ const Login = () => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setStatus(null);
+    
     try {
-      const res = await axios.post('http://localhost:5000/api/auth/login', formData);
+      const res = await api.post('/api/auth/login', formData); // ✅ Fixed endpoint
       console.log(res.data);
-      alert('Login successful!');
-      // TODO: Save the token and redirect the user
+      setStatus({ type: 'success', msg: 'Login successful!' });
+      
+      // Store token in localStorage (you can modify this later)
+      if (res.data.token) {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+      }
+      
+      // TODO: Redirect user to dashboard
     } catch (err) {
-      console.error(err.response.data);
-      alert(err.response.data.msg || 'Login failed.');
+      console.error('Login error:', err.response?.data);
+      const errorMsg = err.response?.data?.msg || err.response?.data?.error || 'Login failed.';
+      setStatus({ type: 'error', msg: errorMsg });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,6 +53,7 @@ const Login = () => {
             value={email}
             onChange={onChange}
             required
+            disabled={loading}
           />
         </div>
         <div className="form-group">
@@ -49,10 +65,23 @@ const Login = () => {
             value={password}
             onChange={onChange}
             required
+            disabled={loading}
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
       </form>
+      
+      {status && (
+        <p style={{ 
+          color: status.type === 'error' ? 'red' : 'green', 
+          marginTop: 12,
+          fontWeight: 'bold'
+        }}>
+          {status.msg}
+        </p>
+      )}
     </div>
   );
 };
