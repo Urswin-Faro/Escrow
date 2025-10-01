@@ -24,8 +24,7 @@ cd backend
 Install the required Node.js dependencies:
 
 Bash
-npm install express mysql2 bcryptjs jsonwebtoken express-validator
-Ensure your MySQL server is running.
+npm i
 
 Configure your database connection by creating a .env file in the backend directory with your database credentials.
 
@@ -55,8 +54,8 @@ Open a new terminal window, navigate to the backend directory, and run the serve
 Bash
 
 cd backend
-npm start
-The backend server will run on http://localhost:5000.
+node src/server.js
+The backend server will run on http://localhost:3000.
 
 Start the Frontend App:
 Open another terminal window, navigate to the frontend directory, and start the React application:
