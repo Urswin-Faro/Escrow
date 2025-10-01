@@ -45,14 +45,21 @@ exports.findUserById = async (id) => {
   }
 };
 
-exports.updateUserPassword = async (userId, newPassword) => {
+exports.updateUserPassword = async (userId, hashedPassword) => {
   try {
-    const hashed = await bcrypt.hash(newPassword, 10);
-    const query = 'UPDATE users SET password = $1 WHERE id = $2';
-    await pool.query(query, [hashed, userId]);
-  } catch (error) {
-    console.error('updateUserPassword error:', error.message);
-    throw error;
+  const result = await pool.query(
+    'UPDATE users SET password = $1 WHERE id = $2 RETURNING id, username, email',
+    [hashedPassword, userId]
+  );
+
+  if (result.rows.length === 0) {
+    throw new Error('User not found');
+  }
+  
+  return result.rows[0];
+} catch (error) {
+  console.error('updateUserPassword error:', error.message);
+  throw error;
   }
 };
 

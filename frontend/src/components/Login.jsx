@@ -1,88 +1,71 @@
 import React, { useState } from 'react';
-import api from '../services/api'; 
+import { login } from '../services/api';
 
-const Login = () => {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+const Login = ({ onToggle, onLogin, onForgotPassword }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(null);
-
-  const { email, password } = formData;
-
-  const onChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
-    setStatus(null);
     
     try {
-      const res = await api.post('/api/auth/login', formData); // ✅ Fixed endpoint
-      console.log(res.data);
-      setStatus({ type: 'success', msg: 'Login successful!' });
+      const data = await login(email, password);
       
-      // Store token in localStorage (you can modify this later)
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('user', JSON.stringify(res.data.user));
-      }
+      // Store token and call the login handler
+      localStorage.setItem('token', data.token);
+      onLogin(data.user); // ✅ This should now work
       
-      // TODO: Redirect user to dashboard
-    } catch (err) {
-      console.error('Login error:', err.response?.data);
-      const errorMsg = err.response?.data?.msg || err.response?.data?.error || 'Login failed.';
-      setStatus({ type: 'error', msg: errorMsg });
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="form-container">
+    <form onSubmit={onSubmit}>
       <h2>Login</h2>
-      <form onSubmit={onSubmit}>
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={onChange}
-            required
-            disabled={loading}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={onChange}
-            required
-            disabled={loading}
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+      {error && <div className="error">{error}</div>}
       
-      {status && (
-        <p style={{ 
-          color: status.type === 'error' ? 'red' : 'green', 
-          marginTop: 12,
-          fontWeight: 'bold'
-        }}>
-          {status.msg}
-        </p>
-      )}
-    </div>
+      <div className="form-group">
+        <label>Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          disabled={loading}
+        />
+      </div>
+      
+      <div className="form-group">
+        <label>Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          disabled={loading}
+        />
+      </div>
+      
+      <button type="submit" disabled={loading}>
+        {loading ? 'Logging in...' : 'Login'}
+      </button>
+      
+      <p>
+        <a href="#" onClick={onForgotPassword}>Forgot Password?</a>
+      </p>
+      
+      <p>
+        Don't have an account? <a href="#" onClick={onToggle}>Register</a>
+      </p>
+    </form>
   );
 };
 
