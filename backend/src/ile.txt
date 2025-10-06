@@ -1,0 +1,47 @@
+-- 1. Create the Transaction Status ENUM
+CREATE TYPE transaction_status AS ENUM (
+    'pending_payment',
+    'funded',
+    'shipped',
+    'cancelled',
+    'released',
+    'completed'
+);
+
+-- 2. Create the 'users' table
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    role VARCHAR(50) NOT NULL DEFAULT 'user', 
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Create the 'password_reset_tokens' table
+CREATE TABLE password_reset_tokens (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    otp_hash VARCHAR(255) UNIQUE NOT NULL, 
+    expires_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 4. Create the 'transactions' table (using the new ENUM type)
+CREATE TABLE transactions (
+    id SERIAL PRIMARY KEY,
+    buyer_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    seller_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    amount DECIMAL(10, 2) NOT NULL,
+    description TEXT,
+    -- Use the custom ENUM type here
+    status transaction_status NOT NULL DEFAULT 'pending_payment', 
+    created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 5. Add Indexes (Optional but Recommended)
+CREATE INDEX idx_users_email ON users (email);
+CREATE INDEX idx_transactions_buyer ON transactions (buyer_id);
+CREATE INDEX idx_transactions_seller ON transactions (seller_id);

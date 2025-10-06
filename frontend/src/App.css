@@ -99,3 +99,74 @@ button {
 button:hover {
   background-color: #4b2ea3;
 }
+
+/* --- New Dashboard Styles --- */
+.App-header-authenticated {
+    background-color: #5d3fd3; /* Darker header for authenticated view */
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: none;
+    margin-bottom: 20px;
+}
+
+.App-header-authenticated h1 {
+    color: white;
+    margin: 0;
+}
+
+.App-header-authenticated button {
+    background-color: white;
+    color: #5d3fd3;
+    padding: 5px 10px;
+    border: 1px solid white;
+    width: auto;
+}
+
+.dashboard-container {
+    width: 100%;
+    text-align: left;
+}
+
+.dashboard-container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #5d3fd3;
+}
+
+.dashboard-content {
+    display: flex;
+    gap: 30px;
+}
+
+.dashboard-content .column {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Transaction Card Styles */
+.transaction-list {
+    margin-top: 20px;
+    border-left: 1px solid #ddd;
+    padding-left: 20px;
+}
+
+.transaction-card {
+    border: 1px solid #eee;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.transaction-card p {
+    margin: 5px 0;
+    font-size: 0.9em;
+}
+
+.transaction-card strong {
+    color: #5d3fd3;
+}
