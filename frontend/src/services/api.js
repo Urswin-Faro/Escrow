@@ -124,5 +124,51 @@ export const fetchSellerTransactions = async () => {
   return res.data;
 };
 
+export const registerAdmin = async (username, email, password) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/register-admin`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Admin registration failed");
+    }
+
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Admin API functions
+export const getAllUsers = async () => {
+  const res = await api.get("/admin/users");
+  return res.data;
+};
+
+export const deleteUser = async (userId) => {
+  const res = await api.delete(`/admin/users/${userId}`);
+  return res.data;
+};
+
+export const updateUserRole = async (userId, role) => {
+  const res = await api.put(`/admin/users/${userId}/role`, { role });
+  return res.data;
+};
+
+export const getAllTransactionsAdmin = async () => {
+  const res = await api.get("/admin/transactions");
+  return res.data;
+};
+
+export const getSystemStats = async () => {
+  const res = await api.get("/admin/stats");
+  return res.data;
+};
+
 // Keep this export for other components that use api.get/post directly
 export default api;

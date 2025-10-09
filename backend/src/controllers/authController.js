@@ -84,7 +84,8 @@ exports.login = async (req, res) => {
       user: {
         id: user.id,
         username: user.username,
-        email: user.email
+        email: user.email,
+        role: user.role
       },
       token
     });
@@ -190,4 +191,63 @@ exports.resetPassword = async (req, res) => {
       error: error.message 
     });
   }
+};
+
+const registerAdmin = async (req, res) => {
+    try {
+        const { username, email, password } = req.body;
+
+        if (!username || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Username, email, and password are required'
+            });
+        }
+
+        // Check if admin user already exists
+        const existingUser = await userModel.findUserByEmail(email);
+
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'Email already registered'
+            });
+        }
+
+        // Create admin user using existing userModel
+        const user = await userModel.createUser(email, password, username, 'admin');
+
+        // Generate JWT token
+        const token = jwt.sign(
+          { id: user.id },
+          process.env.JWT_SECRET,
+          { expiresIn: '24h' }
+        );
+
+        res.status(201).json({
+            success: true,
+            message: 'Admin user created successfully',
+            user: {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+              role: user.role
+            },
+            token
+        });
+    } catch (error) {
+        console.error('Admin registration error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to create admin user'
+        });
+    }
+};
+
+module.exports = {
+  register: exports.register,
+  login: exports.login,
+  requestPasswordReset: exports.requestPasswordReset,
+  resetPassword: exports.resetPassword,
+  registerAdmin
 };

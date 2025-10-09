@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { login } from '../services/api';
+import { useAuth } from '../context/AuthContext.jsx';
 
-const Login = ({ onToggle, onLogin, onForgotPassword }) => {
+const Login = ({ onToggle, onForgotPassword }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  const { login } = useAuth();
 
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -13,11 +15,12 @@ const Login = ({ onToggle, onLogin, onForgotPassword }) => {
     setLoading(true);
     
     try {
-      const data = await login(email, password);
+      const result = await login(email, password);
       
-      // Store token and call the login handler
-      localStorage.setItem('token', data.token);
-      onLogin(data.user); // ✅ This should now work
+      if (!result.success) {
+        setError(result.message || 'Login failed');
+      }
+      // If successful, AuthContext automatically updates user state and App.jsx will show dashboard
       
     } catch (error) {
       console.error('Login error:', error);
