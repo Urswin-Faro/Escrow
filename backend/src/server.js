@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
+const payfastRoutes = require('./routes/payfastRoutes');
 const { pool } = require('./db');
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // <-- required for PayFast ITN
 
 // Test route
 app.get('/', (req, res) => {
@@ -24,6 +26,7 @@ app.get('/', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
+app.use('/api/payfast', payfastRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

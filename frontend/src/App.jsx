@@ -9,6 +9,8 @@ import UserDashboard from "./components/UserDashboard";
 import SellerDashboard from "./components/SellerDashboard"; // NEW
 import AdminDashboard from "./components/AdminDashboard"; // NEW
 import "./App.css";
+import PaymentSuccess from "./components/PaymentSuccess";//Payfast
+
 
 // Component to handle the role-based rendering
 const DashboardRouter = ({ user, handleLogout }) => {
@@ -136,6 +138,10 @@ function App() {
           {currentView === "forgot" && <ForgotPassword onBack={backToLogin} />}
 
           {currentView === "reset" && <ResetPassword onSuccess={backToLogin} />}
+          
+          {/* PayFast success page: shows after payment is completed */}
+          {currentView === "success" && (<PaymentSuccess onRedirect={() => setCurrentView("login")} />
+)}
         </div>
       </main>
     </div>

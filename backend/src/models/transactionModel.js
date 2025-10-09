@@ -43,3 +43,16 @@ exports.findTransactionById = async (transactionId) => {
   const result = await pool.query(query, [transactionId]);
   return result.rows[0];
 };
+
+//  New function to update transaction status with payfast
+exports.updateTransactionStatus = async (transactionId, status) => {
+  const query = `
+    UPDATE transactions
+    SET status = $1
+    WHERE id = $2
+    RETURNING *;
+  `;
+  const values = [status, transactionId];
+  const result = await pool.query(query, values);
+  return result.rows[0];
+};

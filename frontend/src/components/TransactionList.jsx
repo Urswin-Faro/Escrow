@@ -64,6 +64,24 @@ const TransactionList = ({
   if (transactions.length === 0)
     return <p>No transactions found for you as a {type}.</p>;
 
+const handlePayFast = async (tx) => {
+  try {
+    // Call backend to get PayFast URL for existing transaction
+    const res = await api.post("/payfast/initiate", {
+      transactionId: tx.id,
+      buyer_email: tx.buyer_email, // optional, use stored buyer email
+    });
+
+    // Open PayFast in a new tab
+    window.open(res.data.redirectUrl, "_blank")
+
+  } catch (error) {
+    console.error("PayFast initiation failed:", error);
+    alert("Failed to start PayFast payment. Please try again.");
+  }
+};
+
+
   return (
     <div className="transaction-list">
       <h3>{title}</h3>
@@ -91,7 +109,7 @@ const TransactionList = ({
           </p>
           {/* Add action buttons here based on status and user type */}
           {tx.status === "pending_payment" && type === "buyer" && (
-            <button className="action-button pay-button">
+            <button className="action-button pay-button" onClick={() => handlePayFast(tx)}>
               Proceed to PayFast
             </button>
           )}
