@@ -33,3 +33,6 @@ yarn-error.log*
 
 # Coverage reports
 /coverage
+
+# Local Netlify folder
+.netlify
