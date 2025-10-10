@@ -21,7 +21,6 @@ api.interceptors.request.use((config) => {
 
 // --- Public Auth Functions (Keep using fetch for consistency with Urswin's original) ---
 
-// Login function
 export const login = async (email, password) => {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
@@ -42,7 +41,6 @@ export const login = async (email, password) => {
   }
 };
 
-// Register function
 export const register = async (username, email, password) => {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
@@ -63,8 +61,6 @@ export const register = async (username, email, password) => {
   }
 };
 
-// Forgot password and Reset password functions remain the same (using fetch)
-// Forgot password function
 export const forgotPassword = async (email) => {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
@@ -85,7 +81,6 @@ export const forgotPassword = async (email) => {
   }
 };
 
-// Reset password function
 export const resetPassword = async (token, newPassword) => {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
@@ -105,20 +100,36 @@ export const resetPassword = async (token, newPassword) => {
     throw error;
   }
 };
+
 // --- Authenticated Transaction Functions (Use the 'api' axios instance) ---
 
-// This replaces the old createTransaction using fetch
+// Create transaction with PayFast integration // PayFast
 export const createTransaction = async (transactionData) => {
-  const res = await api.post("/transactions/create", transactionData);
-  return res.data;
+  try {
+    const res = await api.post("/transactions/create", transactionData);
+
+    // PayFast: return formParams if backend provides them
+    if (res.data && res.data.payfast) {
+      return {
+        transaction: res.data.transaction,
+        formParams: res.data.payfast, // PayFast: contains all PayFast fields
+      };
+    }
+
+    return res.data;
+  } catch (error) {
+    console.error("Error creating transaction:", error); // PayFast
+    throw error.response?.data || error; // PayFast
+  }
 };
 
-// This is not strictly needed as TransactionList uses 'api.get()' but is here for reference.
+// Fetch buyer transactions
 export const fetchBuyerTransactions = async () => {
   const res = await api.get("/transactions/buyer");
   return res.data;
 };
 
+// Fetch seller transactions
 export const fetchSellerTransactions = async () => {
   const res = await api.get("/transactions/seller");
   return res.data;
