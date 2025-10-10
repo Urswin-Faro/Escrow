@@ -95,7 +95,7 @@ const handlePayFast = async (tx) => {
             {/* Use the helper */}
           </p>
           <p>
-            <strong>Amount:</strong> ${parseFloat(tx.amount).toFixed(2)}
+            <strong>Amount:</strong> R{parseFloat(tx.amount).toFixed(2)}
           </p>
           <p>
             <strong>Description:</strong> {tx.description}

@@ -1,67 +1,221 @@
-Project Overview
-This is a secure escrow service platform that facilitates safe transactions between buyers and sellers. The platform ensures funds are held securely and are only released upon the successful completion of a transaction.
+# Escrow Service Platform
 
-Features
-User Authentication: Secure user registration and login with distinct roles for buyers and sellers.
-Secure Transactions: A robust transaction creation form that uses user emails to initiate an escrow contract.
-Responsive Design: A modern, styled interface for an intuitive user experience.
-Modal Forms: Login, register, and create transaction pages are now modals for an improved user experience.
+A secure escrow service platform that facilitates safe transactions between buyers and sellers. The platform ensures funds are held securely and are only released upon successful completion of transactions with integrated PayFast payment processing.
 
-Prerequisites
-Before you begin, ensure you have the following installed on your machine:
-Node.js & npm: Node.js (which includes npm)
-MySQL Server: A running MySQL server to host your database.
-npm: Ensure you have npm installed with your Node.js.
+## Table of Contents
 
-Installation
-Follow these steps to set up and run the application.
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Running the Application](#running-the-application)
+- [User Roles](#user-roles)
+- [API Endpoints](#api-endpoints)
+- [Payment Integration](#payment-integration)
+- [Database Schema](#database-schema)
+- [Contributing](#contributing)
 
-Backend Setup
-Navigate to the backend directory in your terminal:
+## Features
 
-Bash
+- **User Authentication**: Secure registration and login with role-based access (User, Seller, Admin)
+- **Role-Based Dashboards**: Different interfaces for users, sellers, and administrators
+- **Secure Transactions**: Robust escrow transaction management system
+- **Payment Processing**: Integrated PayFast payment gateway for South African users
+- **Admin Panel**: Complete user management, transaction oversight, and system statistics
+- **Real-time Status Updates**: Automatic transaction status updates via payment notifications
+- **Responsive Design**: Modern, mobile-friendly interface
+
+## Prerequisites
+
+- **Node.js** (v16 or higher)
+- **npm** or **yarn**
+- **PostgreSQL** database (we use Neon PostgreSQL)
+- **PayFast account** (for payment processing)
+
+## Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/Urswin-Faro/Escrow.git
+cd Escrow
+```
+
+### 2. Backend Setup
+
+```bash
 cd backend
-Install the required Node.js dependencies:
+npm install
+```
 
-Bash
-npm i
+### 3. Frontend Setup
 
-Configure your database connection by creating a .env file in the backend directory with your database credentials.
-
-DB_HOST=localhost
-DB_USER=your_db_username
-DB_PASSWORD=your_db_password
-DB_DATABASE=escrow_db
-Set up your database tables by executing the SQL commands we created.
-
-Frontend Setup
-Navigate to the frontend directory in your terminal:
-
-Bash
-
+```bash
 cd frontend
-Install the required React dependencies:
+npm install
+```
 
-Bash
+## Configuration
 
-npm install react react-dom react-router-dom axios react-modal
-Running the Application
-You need to run both the backend and the frontend simultaneously.
+### Environment Variables
 
-Start the Backend Server:
-Open a new terminal window, navigate to the backend directory, and run the server:
+Create a `.env` file in the `backend` directory with the following variables:
 
-Bash
+```env
+# Database Configuration
+DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
 
+# JWT Secret
+JWT_SECRET=your_very_secure_jwt_secret_key
+
+# Email Configuration (optional)
+USE_EMAIL=false
+OTP_TTL_SECONDS=60
+
+# PayFast Configuration
+PAYFAST_MERCHANT_ID=your_merchant_id
+PAYFAST_MERCHANT_KEY=your_merchant_key
+PAYFAST_PASSPHRASE=your_passphrase
+PAYFAST_URL=https://sandbox.payfast.co.za/eng/process
+PAYFAST_NOTIFY_URL=your_public_domain/api/payfast/notify
+PAYFAST_RETURN_URL=your_frontend_domain/success
+PAYFAST_CANCEL_URL=your_frontend_domain/cancel
+```
+
+### Database Setup
+
+The application uses PostgreSQL. Ensure your database has the following tables:
+
+- `users` - User accounts with roles
+- `transactions` - Escrow transactions
+- Additional tables as needed
+
+## Running the Application
+
+### Development Mode
+
+**Start Backend Server:**
+
+```bash
 cd backend
 node src/server.js
-The backend server will run on http://localhost:3000.
+```
 
-Start the Frontend App:
-Open another terminal window, navigate to the frontend directory, and start the React application:
+The backend server runs on `http://localhost:3000`
 
-Bash
+**Start Frontend Application:**
 
+```bash
 cd frontend
 npm run dev
-The frontend application will open in your browser, typically at http://localhost:5173.
+```
+
+The frontend application runs on `http://localhost:5173`
+
+### Production Mode
+
+**Build Frontend:**
+
+```bash
+cd frontend
+npm run build
+```
+
+**Start Backend:**
+
+```bash
+cd backend
+NODE_ENV=production node src/server.js
+```
+
+## User Roles
+
+### User
+- Create and manage transactions as a buyer
+- View transaction history
+- Make payments through PayFast
+
+### Seller
+- Accept and manage transactions
+- View seller-specific transaction history
+- Receive payments upon transaction completion
+
+### Admin
+- **User Management**: View, edit, and delete user accounts
+- **Transaction Oversight**: Monitor all platform transactions
+- **System Statistics**: Access platform analytics and metrics
+- **Role Management**: Update user roles and permissions
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
+
+### Transactions
+- `GET /api/transactions` - Get user transactions
+- `POST /api/transactions` - Create new transaction
+- `PUT /api/transactions/:id` - Update transaction status
+
+### Admin (Admin role required)
+- `GET /api/admin/users` - Get all users
+- `GET /api/admin/transactions` - Get all transactions
+- `DELETE /api/admin/users/:id` - Delete user
+- `PUT /api/admin/users/:id/role` - Update user role
+- `GET /api/admin/stats` - Get system statistics
+
+### PayFast
+- `POST /api/payfast/initiate` - Initialize payment
+- `POST /api/payfast/notify` - Payment notification handler
+
+## Payment Integration
+
+The platform integrates with PayFast for secure payment processing:
+
+- **Sandbox Mode**: For testing and development
+- **Production Mode**: For live transactions
+- **ITN Support**: Instant Transaction Notifications for real-time status updates
+- **Secure Signatures**: All payments are cryptographically signed
+
+## Database Schema
+
+### Users Table
+```sql
+- id (Primary Key)
+- username
+- email
+- password (hashed)
+- role (user, seller, admin)
+- created_at
+```
+
+### Transactions Table
+```sql
+- id (Primary Key)
+- buyer_id (Foreign Key)
+- seller_id (Foreign Key)
+- amount
+- description
+- status (pending_payment, paid, completed, failed)
+- created_at
+```
+
+## Default Admin Account
+
+For initial setup, create an admin account through the registration form, then manually update the role in the database:
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'your-admin-email@example.com';
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
+5. Open a Pull Request
+
+## Support
+
+For support or questions, please open an issue in the GitHub repository.

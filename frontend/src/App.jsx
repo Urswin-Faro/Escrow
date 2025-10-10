@@ -42,7 +42,7 @@ const DashboardRouter = () => {
         <h1>Escrow App</h1>
         <div style={{ display: "flex", alignItems: "center", gap: "15px" }}>
           <span>
-            Welcome, {user?.username || user?.email} ({role.toUpperCase()})
+            Welcome, {user?.username || user?.email}
           </span>
           <button onClick={logout}>Logout</button>
         </div>
