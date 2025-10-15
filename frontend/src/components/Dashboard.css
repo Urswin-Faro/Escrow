@@ -1,80 +1,74 @@
-/* --- UserDashboard-specific Styles (Dashboard.css) --- */
+/* frontend/src/components/Dashboard.css */
 
-/* User Dashboard Main Container */
+/* --- General Dashboard Layout --- */
+
 .user-dashboard-container {
-    /* Inherits main layout from .App > main */
-    text-align: left;
-    max-width: 1200px; /* Make the dashboard wider than the main form area */
-    margin: 0 auto 50px; /* Center it and add space at the bottom */
-    padding: 0; /* Remove default main padding as we want full-width content below */
-    background: none; /* Remove white background from main to allow content to fill */
-    box-shadow: none; /* Remove box-shadow */
+    /* Inherits padding and background from .dashboard-main in App.css */
+    padding: 40px; 
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-/* User Welcome Heading */
 .user-dashboard-container h1 {
-    color: #333; /* Dark text for primary heading */
-    margin-bottom: 20px;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    color: var(--color-dark-bg); /* Deep blue/black for main heading */
 }
 
-/* Notifications Component Styling */
-.notifications-container {
-    background-color: #fff3cd; /* Light warning color */
-    color: #856404;
-    border: 1px solid #ffeeba;
-    padding: 15px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-    font-size: 0.95em;
-    text-align: center;
+/* Style for the User ID line */
+.user-dashboard-container p {
+    font-size: 1rem;
+    color: #666; 
+    margin-bottom: 30px;
+    text-align: left; /* Reset the inline style from the component */
+    font-weight: 400;
 }
 
-/* Tab Navigation Styling */
+.user-dashboard-container h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    color: var(--color-primary-blue);
+    border-left: 4px solid var(--color-primary-blue);
+    padding-left: 15px;
+}
+
+/* --- Tab Navigation (Buyer/Seller Center) --- */
+
 .dashboard-tabs {
     display: flex;
-    justify-content: center; /* Center the tabs */
+    border-bottom: 2px solid #e0e0e0;
     margin-bottom: 30px;
-    background-color: #ffffff;
-    border-radius: 8px;
-    padding: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
 }
 
 .tab-button {
-    padding: 10px 20px;
-    margin: 0 5px;
+    padding: 12px 25px;
+    margin-right: 10px;
+    background-color: transparent;
     border: none;
-    border-radius: 6px;
-    background-color: #eee; /* Light gray for inactive tabs */
-    color: #333;
-    font-size: 16px;
-    font-weight: 600;
+    border-bottom: 3px solid transparent; /* Space for the active indicator */
     cursor: pointer;
-    transition: all 0.3s ease;
-    flex-grow: 1; /* Allow tabs to fill space evenly */
-    max-width: 250px; /* Limit width for cleaner look */
+    font-size: 1rem;
+    font-weight: 600;
+    color: #888;
+    transition: color 0.3s, border-color 0.3s;
 }
 
-.tab-button:hover:not(.active) {
-    background-color: #ddd;
+.tab-button:hover {
+    color: var(--color-dark-bg);
 }
 
 .tab-button.active {
-    background-color: #5d3fd3; /* Brand color for active tab */
-    color: white;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: var(--color-primary-blue);
+    border-bottom-color: var(--color-primary-blue);
 }
 
-/* Dashboard Content & Columns */
+/* --- Dashboard Content Layout --- */
+
 .dashboard-content {
-    display: flex;
-    gap: 30px;
-    text-align: left;
+    /* Contains the views (buyer-view or seller-view) */
 }
 
 .view-columns {
@@ -82,49 +76,202 @@
     gap: 30px;
 }
 
-.view-columns .column {
+.column {
     flex: 1;
-    min-width: 0;
+    /* Optional: Add a light card background to columns */
     padding: 20px;
-    background: #fff;
+    background-color: #fff;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
-.buyer-view h2,
-.seller-view h2 {
-    color: #5d3fd3;
-    text-align: center;
-    margin-bottom: 20px;
-    padding-top: 10px;
-}
-
-.buyer-view h3,
-.seller-view h3 {
-    color: #333;
-    border-bottom: 2px solid #5d3fd3;
-    padding-bottom: 5px;
+/* Style for placeholder/action areas (like the Seller Actions text) */
+.column h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
     margin-bottom: 15px;
-    font-size: 1.2em;
+    color: var(--color-text-dark);
 }
 
-/* Seller Actions Placeholder */
-.seller-view p {
-    font-size: 0.9em;
+.column p {
+    font-size: 0.95rem;
     color: #666;
-    background-color: #f7f7f7;
-    padding: 15px;
-    border-left: 3px solid #f0ad4e; /* Use a warning color for an action area */
-    border-radius: 4px;
 }
 
-/* Responsive Adjustments */
-@media (max-width: 900px) {
-    .dashboard-content {
-        flex-direction: column;
+/* --- Responsiveness --- */
+@media (max-width: 768px) {
+    .user-dashboard-container {
+        padding: 20px;
     }
     .view-columns {
         flex-direction: column;
-        gap: 20px;
     }
+}
+/* frontend/src/components/Dashboard.css (continued) */
+
+/* --- Form Components (Used by CreateTransaction) --- */
+
+.form-container {
+    padding: 25px;
+    background-color: #fff;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-container h2 {
+    /* Override h2 dashboard style to be slightly smaller and darker for forms */
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-dark-bg);
+    margin-top: 0;
+    margin-bottom: 25px;
+    padding-left: 0;
+    border-left: none;
+}
+
+/* Style for textareas (which also need the input field look) */
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    font-family: 'Poppins', sans-serif; /* Ensure consistent font for textarea */
+    resize: vertical;
+}
+
+.form-group textarea:focus {
+    border-color: var(--color-primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+/* Status Messages */
+.status-message {
+    padding: 12px 15px;
+    margin-top: 20px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.status-message.success {
+    color: #155724; /* Dark green text */
+    background-color: #d4edda; /* Light green background */
+    border: 1px solid #c3e6cb;
+}
+
+.status-message.error {
+    color: #721c24; /* Dark red text */
+    background-color: #f8d7da; /* Light red background */
+    border: 1px solid #f5c6cb;
+}
+/* frontend/src/components/Dashboard.css (TRANSACTION LIST STYLES) */
+
+/* --- Transaction List Container --- */
+.transaction-list h3 {
+    /* Styles for the title passed via props */
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--color-text-dark);
+}
+
+/* --- Transaction Card Styles --- */
+.transaction-card {
+    background: #fff;
+    padding: 20px 25px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 5px solid var(--color-primary-blue); /* Visual anchor */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.transaction-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.transaction-card p {
+    margin-bottom: 8px;
+    line-height: 1.4;
+    font-size: 0.95rem;
+    color: #444;
+}
+
+.transaction-card strong {
+    color: var(--color-text-dark);
+    font-weight: 600;
+    min-width: 80px; /* Aligns the data visually */
+    display: inline-block;
+}
+
+.transaction-card small {
+    display: block;
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px dashed #eee;
+    color: #888;
+    font-size: 0.85rem;
+}
+
+/* --- Status Tag Styles --- */
+/* Use background color for better visibility */
+.status-tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-tag.pending-payment {
+    color: #ff9800; /* Darker Orange text */
+    background-color: #fff3e0; /* Light Orange background */
+}
+
+.status-tag.pending-delivery {
+    color: #2196f3; /* Darker Blue text */
+    background-color: #e3f2fd; /* Light Blue background */
+}
+
+.status-tag.completed {
+    color: var(--color-success-green); /* Green text */
+    background-color: #e8f5e9; /* Light Green background */
+}
+
+.status-tag.disputed {
+    color: #f44336; /* Darker Red text */
+    background-color: #ffebee; /* Light Red background */
+}
+
+/* --- Action Button Styles (PayFast) --- */
+.action-button {
+    /* Inherits from .btn in App.css for basic structure */
+    padding: 8px 18px;
+    margin-top: 15px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pay-button {
+    background-color: var(--color-primary-blue);
+    color: white;
+    border: none;
+}
+
+.pay-button:hover {
+    background-color: #0056b3;
 }

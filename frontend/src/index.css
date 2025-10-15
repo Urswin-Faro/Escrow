@@ -1,0 +1,124 @@
+/* frontend/src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'); /* Add your desired font */
+
+:root {
+  /* Main Colors */
+  --color-dark-bg: #0b1a2e; /* Deep dark blue for the hero */
+  --color-primary-blue: #007bff; /* Primary action color */
+  --color-text-dark: #333;
+  --color-text-light: #f9fafb;
+  --color-background-light: #f7f9fc; /* Off-white for sections */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  color: var(--color-text-dark);
+}
+/* frontend/src/App.css (NEW AUTH/FORM STYLES) */
+
+/* --- Authentication Container --- */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Takes up the remaining height of the viewport */
+    min-height: calc(100vh - 80px); 
+    padding: 40px 20px;
+    background-color: var(--color-background-light); /* Off-white background */
+}
+
+/* --- Auth Card/Box Styles --- */
+.auth-card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; /* Standard form width */
+    text-align: center;
+}
+
+.auth-card h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    margin-bottom: 25px;
+}
+
+/* --- Form Elements --- */
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 5px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input:focus {
+    border-color: var(--color-primary-blue);
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+/* --- Primary Button for Forms (Inherits .btn and .btn-primary) --- */
+.form-submit-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    /* We can combine global btn styles here */
+    composes: btn btn-primary from global; 
+    /* NOTE: If using pure CSS, you'll need to copy the btn-primary properties */
+}
+
+/* Fallback for pure CSS if composes is not available */
+.form-submit-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--color-primary-blue);
+    color: white;
+    border: none;
+}
+.form-submit-btn:hover {
+    background: #0056b3;
+}
+
+/* --- Toggle Links --- */
+.auth-link {
+    display: block;
+    margin-top: 15px;
+    color: var(--color-primary-blue);
+    text-decoration: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}

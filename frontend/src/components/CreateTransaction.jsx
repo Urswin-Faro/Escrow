@@ -1,118 +1,122 @@
 // src/components/CreateTransaction.jsx
 import React, { useState } from "react";
-import api, { createTransaction } from "../services/api"; // Import the dedicated function
+// Assuming you have a default utility icon for the button
+import { FiPlus } from 'react-icons/fi'; 
+import api, { createTransaction } from "../services/api"; 
 
 const CreateTransaction = () => {
-  const [formData, setFormData] = useState({
-    sellerId: "", // Changed from seller_id to sellerId to match backend controller convention
-    amount: "",
-    description: "",
-  });
-  const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState(null);
+  const [formData, setFormData] = useState({
+    sellerId: "",
+    amount: "",
+    description: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState(null);
 
-  const { sellerId, amount, description } = formData; // Destructure with new name
+  const { sellerId, amount, description } = formData;
 
-  const onChange = (e) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const onChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setStatus(null);
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setStatus(null);
 
-    // Data structure matches the required payload for the backend (sellerId, amount, description)
-    const transactionData = {
-      sellerId,
-      amount: parseFloat(amount),
-      description,
-    };
+    const transactionData = {
+      sellerId,
+      amount: parseFloat(amount),
+      description,
+    };
 
-    try {
-      // Use the dedicated function which internally uses axios/api
-      const res = await createTransaction(transactionData);
-      console.log(res); // API response object
+    try {
+      const res = await createTransaction(transactionData);
+      setStatus({
+        type: "success",
+        msg: `Transaction for $${amount} created successfully with ID: ${res.transaction.id}.`,
+      });
+      setFormData({ sellerId: "", amount: "", description: "" });
+    } catch (err) {
+      const errorMsg =
+        err.response?.data?.msg ||
+        err.message ||
+        "Transaction creation failed.";
+      setStatus({ type: "error", msg: errorMsg });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      // The buyerId is automatically added by the backend's auth middleware
-      setStatus({
-        type: "success",
-        msg: `Transaction for $${amount} created successfully with ID: ${res.transaction.id}.`,
-      });
+  return (
+    <div className="form-container">
+      <h2>Create New Transaction</h2>
+      <form onSubmit={onSubmit}>
+        
+        {/* The 'form-group' and input styles are inherited from App.css */}
+        <div className="form-group">
+          <label htmlFor="sellerId">Seller ID (Recipient):</label>
+          <input
+            id="sellerId"
+            type="number"
+            name="sellerId"
+            value={sellerId}
+            onChange={onChange}
+            required
+            disabled={loading}
+            min="1"
+            placeholder="Enter seller's User ID"
+          />
+        </div>
 
-      setFormData({ sellerId: "", amount: "", description: "" });
-    } catch (err) {
-      console.error("Transaction creation error:", err.message);
-      // Error handling for axios
-      const errorMsg =
-        err.response?.data?.msg ||
-        err.message ||
-        "Transaction creation failed.";
-      setStatus({ type: "error", msg: errorMsg });
-    } finally {
-      setLoading(false);
-    }
-  };
+        <div className="form-group">
+          <label htmlFor="amount">Amount:</label>
+          <input
+            id="amount"
+            type="number"
+            name="amount"
+            value={amount}
+            onChange={onChange}
+            required
+            disabled={loading}
+            min="0.01"
+            step="0.01"
+            placeholder="0.00"
+          />
+        </div>
 
-  return (
-    <div className="form-container">
-      <h2>Create New Transaction</h2>
-      <form onSubmit={onSubmit}>
-        {/* REMOVED: Buyer ID input, as it comes from the authenticated user's token */}
+        <div className="form-group">
+          <label htmlFor="description">Description:</label>
+          <textarea
+            id="description"
+            name="description"
+            value={description}
+            onChange={onChange}
+            required
+            disabled={loading}
+            rows="4"
+            placeholder="Briefly describe the goods or service."
+          />
+        </div>
+        
+        {/* Uses the primary button style established in App.css */}
+        <button type="submit" disabled={loading} className="form-submit-btn">
+          {loading ? "Creating..." : (
+              <>
+                  <FiPlus style={{ marginRight: '5px' }} />
+                  Create Transaction
+              </>
+          )}
+        </button>
+      </form>
 
-        <div className="form-group">
-          <label>Seller ID (Recipient):</label>
-          <input
-            type="number"
-            name="sellerId" // Updated name to match formData state
-            value={sellerId}
-            onChange={onChange}
-            required
-            disabled={loading}
-            min="1"
-          />
-        </div>
-        <div className="form-group">
-          <label>Amount:</label>
-          <input
-            type="number"
-            name="amount"
-            value={amount}
-            onChange={onChange}
-            required
-            disabled={loading}
-            min="0.01"
-            step="0.01"
-          />
-        </div>
-        <div className="form-group">
-          <label>Description:</label>
-          <textarea
-            name="description"
-            value={description}
-            onChange={onChange}
-            required
-            disabled={loading}
-            rows="4"
-          />
-        </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Transaction"}
-        </button>
-      </form>
-
-      {status && (
-        <p
-          style={{
-            color: status.type === "error" ? "red" : "green",
-            marginTop: 12,
-            fontWeight: "bold",
-          }}
-        >
-          {status.msg}
-        </p>
-      )}
-    </div>
-  );
+      {status && (
+        // Apply status classes for visual feedback
+        <div className={`status-message ${status.type}`}>
+          {status.msg}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default CreateTransaction;
